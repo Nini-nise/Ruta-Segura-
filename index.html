@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ruta Segura: Misión Urbana</title>
+  <!-- Tipografías: Permanent Marker (títulos), Caveat (notas a mano), Poppins (texto) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Permanent+Marker&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ HUD (barra superior, visible durante el juego) ============ -->
+  <header id="hud" class="oculto">
+    <div class="hud-logo">RUTA <span>SEGURA</span></div>
+    <div class="hud-dato">
+      <span class="hud-etiqueta" id="hud-distrito">Distrito</span>
+    </div>
+    <div class="hud-seguridad" aria-label="Nivel de seguridad">
+      <span class="hud-etiqueta">Seguridad</span>
+      <div class="barra"><div id="barra-seguridad"></div></div>
+      <span id="valor-seguridad">50</span>
+    </div>
+    <div class="hud-dato">🪙 <span id="valor-fichas">0</span></div>
+    <button id="btn-menu" class="btn-icono" aria-label="Abrir menú">☰</button>
+  </header>
+
+  <main>
+
+    <!-- ============ PANTALLA 1: INICIO ============ -->
+    <section id="pantalla-inicio" class="pantalla activa">
+      <div class="inicio-contenido">
+        <p class="kanji">安全なルート</p>
+        <div class="heroe">
+          <img class="heroe-img" src="assets/liam-frontal.png" alt="Liam, el mensajero urbano" onerror="this.style.display='none'">
+          <p class="heroe-nombre">LIAM<span>Mensajero urbano · valiente, rápido y decidido</span></p>
+        </div>
+        <h1 class="logo">
+          <span class="logo-ruta">RUTA</span>
+          <span class="logo-segura">SEGURA</span>
+          <span class="logo-sub">MISIÓN URBANA</span>
+        </h1>
+        <p class="lema">Un viaje, tres distritos, seis decisiones… y un solo objetivo.</p>
+        <div class="historia">
+          <p>Kage City sufre una falla en su sistema de movilidad: calles caóticas, rutas bloqueadas y riesgo para todos.
+          Eres <strong>Liam</strong>, un mensajero urbano, y debes cruzar tres distritos para entregar el dispositivo que
+          restablecerá la movilidad segura.</p>
+          <p><strong>Cada decisión cuenta.</strong> Elige bien, cuida tu nivel de seguridad y salva la ciudad.</p>
+        </div>
+        <div class="botones-inicio">
+          <button id="btn-jugar" class="btn btn-principal">▶ Jugar</button>
+          <button id="btn-continuar" class="btn oculto">Continuar</button>
+          <button id="btn-como" class="btn">¿Cómo se juega?</button>
+        </div>
+        <div id="como-jugar" class="nota-papel oculto">
+          <ul>
+            <li>Recorre 3 distritos. En cada uno enfrentas <strong>2 decisiones</strong>.</li>
+            <li>Cada opción cambia tu <strong>Seguridad</strong> (barra) y tus <strong>fichas</strong> 🪙.</li>
+            <li>Verás la consecuencia de inmediato.</li>
+            <li>Puedes <strong>repetir cualquier distrito</strong> desde el mapa para mejorar tu resultado.</li>
+            <li>Hay <strong>3 finales</strong> posibles según tu seguridad total.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PANTALLA 2: MAPA DE NIVELES ============ -->
+    <section id="pantalla-mapa" class="pantalla">
+      <h2 class="titulo-seccion">Mapa de Kage City</h2>
+      <p class="subtitulo">Elige un distrito. Los distritos se desbloquean en orden.</p>
+      <div id="mapa-niveles" class="mapa"></div>
+      <div class="acciones-centro">
+        <button id="btn-ver-final" class="btn btn-principal oculto">Ver final</button>
+        <button id="btn-reiniciar-todo" class="btn">Reiniciar aventura</button>
+        <button id="btn-inicio" class="btn">← Inicio</button>
+      </div>
+    </section>
+
+    <!-- ============ PANTALLA 3: ESCENA ============ -->
+    <section id="pantalla-escena" class="pantalla">
+      <div id="escena-visual" class="escena-visual">
+        <div class="cielo"></div>
+        <div id="ciudad" class="ciudad"></div>
+        <div id="lluvia" class="lluvia"></div>
+        <div id="sirenas" class="sirenas"></div>
+        <div id="calle" class="calle">
+          <div id="situacion-icono" class="situacion-icono">🚦</div>
+          <!-- Personaje: Liam (assets/liam-derecha.png). Para cambiarlo, reemplaza esa imagen. -->
+          <div id="personaje" class="personaje" aria-label="Liam, el mensajero urbano">
+            <img src="assets/liam-derecha.png" alt="Liam, el mensajero urbano"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <span class="personaje-emoji">🏃</span> <!-- respaldo si falta la imagen -->
+          </div>
+          <div id="efecto" class="efecto"></div>
+        </div>
+      </div>
+
+      <div class="panel-decision">
+        <div class="panel-cabecera">
+          <span id="escena-etiqueta" class="etiqueta">Shibuya · Hora pico</span>
+          <span id="escena-contador" class="contador">Decisión 1 de 2</span>
+        </div>
+        <h2 id="escena-titulo">Título</h2>
+        <p id="escena-texto" class="situacion">Situación</p>
+        <div id="opciones" class="opciones"></div>
+
+        <div id="consecuencia" class="consecuencia oculto">
+          <div id="consecuencia-tag" class="tag"></div>
+          <p id="consecuencia-texto"></p>
+          <p id="consecuencia-cambios" class="cambios"></p>
+          <button id="btn-siguiente" class="btn btn-principal">Continuar →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PANTALLA 4: RESULTADO DEL DISTRITO ============ -->
+    <section id="pantalla-resultado" class="pantalla">
+      <div class="tarjeta">
+        <p class="etiqueta" id="res-distrito">Distrito superado</p>
+        <h2 id="res-titulo">¡Distrito completado!</h2>
+        <div id="res-estrellas" class="estrellas">★★★</div>
+        <p id="res-texto"></p>
+        <ul id="res-lista" class="historial"></ul>
+        <p class="resumen-numeros">
+          Seguridad total: <strong id="res-seguridad">0</strong> · Fichas: <strong id="res-fichas">0</strong>
+        </p>
+        <div class="acciones-centro">
+          <button id="btn-res-siguiente" class="btn btn-principal">Siguiente distrito →</button>
+          <button id="btn-res-repetir" class="btn">↺ Repetir distrito</button>
+          <button id="btn-res-mapa" class="btn">Mapa</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PANTALLA 5: FINAL ============ -->
+    <section id="pantalla-final" class="pantalla">
+      <div class="tarjeta" id="tarjeta-final">
+        <img id="final-liam" class="final-liam" src="assets/liam-frontal.png" alt="Liam" onerror="this.style.display='none'">
+        <div id="final-emoji" class="final-emoji">🏙️</div>
+        <p class="etiqueta">Final</p>
+        <h2 id="final-titulo">Título</h2>
+        <p id="final-texto"></p>
+        <p class="resumen-numeros">
+          Seguridad: <strong id="final-seguridad">0</strong>/100 · Fichas: <strong id="final-fichas">0</strong>
+        </p>
+        <h3>Tus decisiones</h3>
+        <ul id="final-historial" class="historial"></ul>
+        <p id="final-mensaje" class="nota-final"></p>
+        <div class="acciones-centro">
+          <button id="btn-final-repetir" class="btn btn-principal">↺ Jugar de nuevo</button>
+          <button id="btn-final-mapa" class="btn">Volver al mapa</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ MENÚ DE PAUSA ============ -->
+  <div id="menu" class="overlay oculto" role="dialog" aria-label="Menú">
+    <div class="menu-caja">
+      <h3>Menú</h3>
+      <button id="menu-continuar" class="btn btn-principal">Continuar</button>
+      <button id="menu-reiniciar" class="btn">Reiniciar nivel</button>
+      <button id="menu-mapa" class="btn">Volver al mapa</button>
+      <button id="menu-config" class="btn">Configuración</button>
+      <div id="config-panel" class="config oculto">
+        <label><input type="checkbox" id="cfg-sonido" checked> Sonido</label>
+        <label><input type="checkbox" id="cfg-animaciones"> Reducir animaciones</label>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
